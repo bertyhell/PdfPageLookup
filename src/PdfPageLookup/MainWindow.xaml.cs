@@ -51,7 +51,7 @@ namespace PdfPageLookup
                 foreach (string word in pageOccurencesPerWord.Keys.OrderBy(k => k))
                 {
                     HashSet<int> pageNumbers = pageOccurencesPerWord[word];
-                    if (numberOfPages < 4 || pageNumbers.Count < numberOfPages * 0.5) // Less than 50% of the pages contain the word
+                    if (numberOfPages < 4 || pageNumbers.Count < 20)
                     {
                         List<int> orderedPageNumbers = pageNumbers.OrderBy(p => p).ToList();
                         string pageNumberString = string.Join(", ", CompactNumbersIntoIntervals(orderedPageNumbers));
@@ -87,7 +87,7 @@ namespace PdfPageLookup
             for (int page = 1; page <= reader.NumberOfPages; page++)
             {
                 string text = PdfTextExtractor.GetTextFromPage(reader, page);
-                string[] words = text
+                string[] words = Regex.Replace(text, "[()/\\$%£µ=+~;@#&|\"'§^!ç{à}°_]+", " ")
                     .Split(new string[] { "\r\n", "\n", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(w => Regex.Replace(Regex.Replace(w.Trim(), "^[^a-zA-Z0-9]+", ""), "[^a-zA-Z0-9]+$", "").ToLower())
                     .Distinct()

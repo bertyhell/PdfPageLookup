@@ -1,5 +1,5 @@
 .vs
 *.suo
-PdfPageLookup/packages
-PdfPageLookup/PdfPageLookup/bin
-PdfPageLookup/PdfPageLookup/obj
+src/packages
+src/PdfPageLookup/bin
+src/PdfPageLookup/obj
