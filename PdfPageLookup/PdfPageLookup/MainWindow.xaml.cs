@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using System.Linq;
 using System.IO;
 using System.Windows;
+using System.Text.RegularExpressions;
 
 namespace PdfPageLookup
 {
@@ -35,7 +36,7 @@ namespace PdfPageLookup
                 {
                     foreach (string word in wordOccurence.Words)
                     {
-                        if (!commonWords.Contains(word))
+                        if (!commonWords.Contains(word.ToLower()))
                         {
                             if (!pageOccurencesPerWord.ContainsKey(word))
                             {
@@ -50,7 +51,7 @@ namespace PdfPageLookup
                 foreach (string word in pageOccurencesPerWord.Keys.OrderBy(k => k))
                 {
                     HashSet<int> pageNumbers = pageOccurencesPerWord[word];
-                    if (pageNumbers.Count < numberOfPages * 0.5) // Less than 50% of the pages contain the word
+                    if (numberOfPages < 4 || pageNumbers.Count < numberOfPages * 0.5) // Less than 50% of the pages contain the word
                     {
                         List<int> orderedPageNumbers = pageNumbers.OrderBy(p => p).ToList();
                         string pageNumberString = string.Join(", ", CompactNumbersIntoIntervals(orderedPageNumbers));
@@ -88,7 +89,7 @@ namespace PdfPageLookup
                 string text = PdfTextExtractor.GetTextFromPage(reader, page);
                 string[] words = text
                     .Split(new string[] { "\r\n", "\n", " ", "\t" }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(w => w.Trim())
+                    .Select(w => Regex.Replace(Regex.Replace(w.Trim(), "^[^a-zA-Z0-9]+", ""), "[^a-zA-Z0-9]+$", "").ToLower())
                     .Distinct()
                     .Where(w => w.Length > 1)
                     .ToArray();
